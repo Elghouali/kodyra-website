@@ -1,0 +1,58 @@
+name: Build and Deploy KODYRA to Cloudflare
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kodyra-cloudflare-production
+  cancel-in-progress: false
+
+jobs:
+  verify-package-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate, test and build
+        run: |
+          npm run check
+          npm test
+          npm run build
+          node scripts/build-worker.mjs
+          node --check build/kodyra-worker.js
+          node scripts/smoke-worker.mjs
+      - name: Upload independently reviewable Worker bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: kodyra-cloudflare-worker
+          path: build/kodyra-worker.js
+          retention-days: 14
+      - name: Deploy to existing Cloudflare Worker (if authorized)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${CLOUDFLARE_API_TOKEN}" || -z "${CLOUDFLARE_ACCOUNT_ID}" ]]; then
+            echo "Deployment skipped: scoped Cloudflare GitHub Actions secrets not yet configured." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          curl --fail-with-body --silent --show-error --retry 2 --max-time 90 \
+            --request PUT \
+            --header "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            --header "Content-Type: application/javascript" \
+            --data-binary @build/kodyra-worker.js \
+            "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/workers/scripts/kodyra-studio" \
+            > cloudflare-deploy-result.json
+          node --input-type=module -e "import fs from 'node:fs';const r=JSON.parse(fs.readFileSync('cloudflare-deploy-result.json','utf8'));if(!r.success)throw new Error('Cloudflare deployment returned success=false');console.log('Cloudflare deployment accepted.');"
+          echo "Cloudflare accepted the KODYRA deployment. Verify the production URL in a browser." >> "$GITHUB_STEP_SUMMARY"

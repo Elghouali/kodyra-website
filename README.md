@@ -17,11 +17,11 @@ The public-facing **KODYRA agency website**. Modern Startup branding, English/Fr
 - `npm run build` copies static files to `dist/` for Cloudflare Pages or Workers Static Assets.
 - `.github/workflows/ci.yml` checks source, tests, and build on push and pull request.
 
-## Automatic publishing
+## Automated Cloudflare deployment (ready for credentials)
 
-Pushes to `main` run tests and build the site, then publish the generated assets to the `gh-pages` branch using `.github/workflows/pages.yml`. The repository owner must enable **Settings → Pages → Deploy from a branch → gh-pages / (root)** once. After GitHub reports publication, the URL will normally be `https://elghouali.github.io/kodyra-website/`.
+GitHub Actions now builds, tests and packages a self-contained Cloudflare Worker on every push to `main`. The `.github/workflows/cloudflare.yml` workflow can automatically update the existing `kodyra-studio` Worker when two scoped Actions secrets are configured (`CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`). Without them, it checks the build and **skips deployment** rather than falsely reporting an update.
 
-The current Cloudflare Worker is a **separate deployment** and does not automatically receive GitHub updates. See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for safe setup, testing and rollback. GitHub Pages is not recommended for this business website under GitHub's usage terms.
 
 ## Local preview
 

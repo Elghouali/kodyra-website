@@ -1,30 +1,45 @@
-# KODYRA deployment guide
+# KODYRA deployment runbook
 
-## GitHub Pages: automatic, free, secretless
+## Hosting
 
-The workflow `.github/workflows/pages.yml` builds, tests, and publishes only the site assets to `gh-pages` whenever `main` changes.
+Production: **Cloudflare Workers**, at:
+`https://kodyra-studio.elghoualizakariae.workers.dev/`.
 
-**One-time setup for the repository owner:**
+The agency site is a business website. GitHub Pages is **not** the recommended host: GitHub's terms restrict using Pages as free hosting for an online business (https://docs.github.com/en/site-policy/github-terms/github-terms-for-additional-products-and-features#pages).
 
-1. Open [Settings → Pages](https://github.com/Elghouali/kodyra-website/settings/pages).
-2. Under **Build and deployment** select **Deploy from a branch**.
-3. Select `gh-pages`, folder `/(root)`, and Save.
-4. Wait for the Pages deployment to finish, then check `https://elghouali.github.io/kodyra-website/`.
+## GitHub Actions -> Cloudflare Workers
 
-The publish job uses GitHub's built-in `GITHUB_TOKEN` with `contents: write`; no paid plan, external provider token or secret is needed. If it cannot push, check **Settings → Actions → General → Workflow permissions**.
+Two workflows are configured:
 
-## Existing Cloudflare Workers site
+- `.github/workflows/ci.yml`: run source checks, tests and static build; upload a ZIP-able artifact
+- `.github/workflows/cloudflare.yml`: validate, build, package a self-contained Cloudflare Worker, smoke-test that Worker, and **deploy when the required GitHub repository secrets exist**
 
-`https://kodyra-studio.elghoualizakariae.workers.dev/` remains independently hosted on Cloudflare. GitHub commits do not automatically deploy there: Cloudflare's connected Git repository currently reports a disconnected Git account.
+For automatic deployment, the repository owner must configure two **GitHub Actions repository secrets** under **Settings > Secrets and variables > Actions**:
 
-**Do not put Cloudflare API keys in this repository.** When Cloudflare Git integration becomes available, configure the Worker build explicitly and validate a new deployment before retiring any existing URL.
+| Name | Description |
+| --- | --- |
+| `CLOUDFLARE_API_TOKEN` | Least-privileged Cloudflare API token with Workers Scripts edit permission on the target Cloudflare account |
+| `CLOUDFLARE_ACCOUNT_ID` | Target account identifier (store as an Actions secret for consistency) |
 
-## Publish verification
+Create the API token using Cloudflare's approved token management flow, never from a link sent by a stranger. **Never put it in Git history, workflow YAML, an issue or chat.**
 
-- Inspect [Actions](https://github.com/Elghouali/kodyra-website/actions): both workflows should pass on `main`.
-- Inspect the `gh-pages` branch: only deployable site files should be present.
-- Verify the English/French language switch, two browser demos, FleetOps external link and the project inquiry email draft on mobile and desktop.
-- The contact form opens an email draft. It does not send a message or capture lead data on a server.
-- The examples use fictional data. Do not imply they are paid client projects.
+If either secret is not configured, the job still validates and packages the website but records **deployment skipped** in its GitHub Actions job summary. It does not claim that Cloudflare was updated.
 
-For rollback, revert the source commit on `main` and allow the publishing workflow to republish the previous version.
+Once both secrets are configured, every push to `main` runs tests then uploads the resulting Worker script to the existing `kodyra-studio` Worker using Cloudflare's authenticated REST API. A successful API response is checked for `success: true`. The existing `workers.dev` URL remains unchanged.
+
+Cloudflare Git-based Builds could provide a more integrated solution when the external Git connection is repaired; it currently reports the Git account as disconnected.
+
+## Manual plugin deployment
+
+The Cloudflare plugin can independently update the Worker with the same verified generated script without requiring dashboard access. This is how the initial site was launched. Such updates are **manual** until the GitHub Actions secrets are configured.
+
+## Rollback and verification
+
+- Revert a source commit on `main` and let the Cloudflare deploy workflow republish the previous release (once credentials are configured).
+- Run `npm run check && npm test && npm run build && node scripts/build-worker.mjs && node scripts/smoke-worker.mjs`.
+- Confirm desktop/mobile layout, EN/FR switch, data cleaning demo, quote demo, external FleetOps link and email draft.
+- Contact forms are **mailto drafts**, not server-side submissions; demo metrics are fictional.
+
+## Security
+
+No secrets belong in GitHub source or test fixtures. Use a scoped token and rotate it if exposed. Test changes in CI before deploying the live Worker; no paid domain is required.
