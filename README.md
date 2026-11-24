@@ -8,7 +8,7 @@ The public-facing **KODYRA agency website**. Modern Startup branding, English/Fr
 - **Data quality mini-lab:** CSV parser handles quoted/multiline fields, rejects inconsistent structure, detects exact duplicates, measures missing values, and exports neutralized CSV.
 - **Booking quote mini-lab:** deterministic vehicle rate calculation with date validation; no transactions or real bookings.
 - **Source case studies:** visible engineering reference repos with status limitations stated, not fabricated customer projects.
-- **Project inquiry:** HTML form opens the visitor's email app using `mailto:`. The website **does not collect or transmit lead forms server-side**, and opening an email draft does not guarantee delivery.
+- **Project inquiry:** service, budget, timing and problem description; the form opens the visitor's email app using `mailto:`. The website **does not collect or transmit lead forms server-side**, and opening an email draft does not guarantee delivery.
 
 ## Tech & hosting
 
@@ -16,6 +16,12 @@ The public-facing **KODYRA agency website**. Modern Startup branding, English/Fr
 - `npm run check`, `npm test`, `npm run build` (Node >=20).
 - `npm run build` copies static files to `dist/` for Cloudflare Pages or Workers Static Assets.
 - `.github/workflows/ci.yml` checks source, tests, and build on push and pull request.
+
+## Automatic publishing
+
+Pushes to `main` run tests and build the site, then publish the generated assets to the `gh-pages` branch using `.github/workflows/pages.yml`. The repository owner must enable **Settings → Pages → Deploy from a branch → gh-pages / (root)** once. After GitHub reports publication, the URL will normally be `https://elghouali.github.io/kodyra-website/`.
+
+The current Cloudflare Worker is a **separate deployment** and does not automatically receive GitHub updates. See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
 ## Local preview
 
