@@ -5,6 +5,7 @@ The public-facing **KODYRA agency website**. Modern Startup branding, English/Fr
 ## What is real
 
 - **KODYRA FleetOps:** functional demonstration hosted at `https://kodyra-fleetops-live.elghoualizakariae.workers.dev/`. Source: `https://github.com/Elghouali/kodyra-fleetops`. Uses fictional data and browser-local state. It is not a production multiuser rental system or a commissioned project.
+- **FleetOps business solution:** `/solutions/fleetops/` explains potential agency outcomes, demonstrates available logic, separates prototype capabilities from production requirements, and offers a tailored inquiry email. No fabricated customer claims.
 - **Data quality mini-lab:** CSV parser handles quoted/multiline fields, rejects inconsistent structure, detects exact duplicates, measures missing values, and exports neutralized CSV.
 - **Booking quote mini-lab:** deterministic vehicle rate calculation with date validation; no transactions or real bookings.
 - **Source case studies:** visible engineering reference repos with status limitations stated, not fabricated customer projects.

@@ -5,7 +5,10 @@ const assets = [
   ['styles/main.css', 'text/css; charset=utf-8'],
   ['src/main.js', 'text/javascript; charset=utf-8'],
   ['src/core.js', 'text/javascript; charset=utf-8'],
-  ['assets/favicon.svg', 'image/svg+xml']
+  ['assets/favicon.svg', 'image/svg+xml'],
+  ['solutions/fleetops/index.html', 'text/html; charset=utf-8'],
+  ['solutions/fleetops/fleetops.css', 'text/css; charset=utf-8'],
+  ['solutions/fleetops/fleetops.js', 'text/javascript; charset=utf-8']
 ];
 const routes = {};
 for (const [path, mime] of assets) {
@@ -25,7 +28,8 @@ const source = [
   "function handleRequest(req) {",
   "  if (req.method !== 'GET' && req.method !== 'HEAD') return new Response('Method not allowed', {status:405, headers:{Allow:'GET, HEAD'}});",
   "  const path = new URL(req.url).pathname;",
-  "  const route = ROUTES[path === '/' ? '/index.html' : path];",
+  "  const file = path === '/' ? '/index.html' : ((path === '/solutions/fleetops' || path === '/solutions/fleetops/') ? '/solutions/fleetops/index.html' : path);",
+  "  const route = ROUTES[file];",
   "  if (!route) return new Response('Not found', {status:404,headers:{'Content-Type':'text/plain; charset=utf-8',...SECURITY}});",
   "  return new Response(req.method === 'HEAD' ? null : route.body, {status:200,headers:{'Content-Type':route.mime,'Cache-Control':'public, max-age=300',...SECURITY}});",
   "}"

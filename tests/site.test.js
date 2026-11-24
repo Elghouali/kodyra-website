@@ -20,3 +20,15 @@ test('portfolio clearly labels its engineering demonstrations', () => {
 test('hero and contact avoid generic glowing status dots', () => {
   assert.doesNotMatch(html, /class="pulse-dot"/);
 });
+
+test('FleetOps solution is linked and distinguishes demo from production', () => {
+  const solution = readFileSync(new URL('../solutions/fleetops/index.html', import.meta.url), 'utf8');
+  const solutionScript = readFileSync(new URL('../solutions/fleetops/fleetops.js', import.meta.url), 'utf8');
+  assert.match(html, /href="\/solutions\/fleetops\/"/);
+  assert.match(solution, /Demo vs\. client-ready system/);
+  assert.match(solution, /not a secure multi-user SaaS/);
+  assert.match(solution, /mailto:elghoualizakariae@gmail\.com/);
+  assert.match(solution, /data-t="faqQ1"/);
+  assert.match(solutionScript, /kodyra-site-lang/);
+  assert.doesNotMatch(solution, /class="pulse-dot"/);
+});

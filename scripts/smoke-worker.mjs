@@ -19,12 +19,15 @@ async function fetchMock(path, method='GET') {
 const homepage=await fetchMock('/');
 assert.equal(homepage.status, 200);
 assert.match(await homepage.text(), /KODYRA/);
-for (const [path,mime] of [['/src/main.js','text/javascript'],['/styles/main.css','text/css'],['/assets/favicon.svg','image/svg+xml']]) {
+for (const [path,mime] of [['/src/main.js','text/javascript'],['/styles/main.css','text/css'],['/assets/favicon.svg','image/svg+xml'],['/solutions/fleetops/','text/html'],['/solutions/fleetops/fleetops.css','text/css'],['/solutions/fleetops/fleetops.js','text/javascript']]) {
   const response=await fetchMock(path);
   assert.equal(response.status, 200);
   assert.ok(response.headers.get('content-type').startsWith(mime));
   assert.ok((await response.text()).length>50);
 }
+const solution=await fetchMock('/solutions/fleetops/');
+assert.match(await solution.text(), /Your operations should too/);
+assert.equal((await fetchMock('/solutions/fleetops')).status,200);
 assert.equal((await fetchMock('/does-not-exist')).status,404);
 assert.equal((await fetchMock('/', 'POST')).status,405);
 assert.equal((await fetchMock('/', 'HEAD')).status,200);
