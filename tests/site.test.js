@@ -16,3 +16,7 @@ test('portfolio clearly labels its engineering demonstrations', () => {
   assert.match(main, /formTimeline:'Desired timeframe'/);
   assert.match(main, /formTimeline:'Délai souhaité'/);
 });
+
+test('hero and contact avoid generic glowing status dots', () => {
+  assert.doesNotMatch(html, /class="pulse-dot"/);
+});
