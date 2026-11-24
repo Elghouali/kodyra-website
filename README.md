@@ -11,6 +11,12 @@ The public-facing **KODYRA agency website**. Modern Startup branding, English/Fr
 - **Source case studies:** visible engineering reference repos with status limitations stated, not fabricated customer projects.
 - **Project inquiry:** service, budget, timing and problem description; the form opens the visitor's email app using `mailto:`. The website **does not collect or transmit lead forms server-side**, and opening an email draft does not guarantee delivery.
 
+## Commercial-readiness materials
+
+- [FleetOps service offer](sales/fleetops-offer.md) — problem framing, demonstrated features, scope-dependent production work, and qualification.
+- [Five-minute FleetOps demo script](sales/fleetops-demo.md) — ethical discovery-led demo with clear prototype limitations.
+- [First 20 conversations plan](sales/first-20-prospects.md) — targeted research checklist and English/French outreach templates. No outreach has been sent.
+
 ## Tech & hosting
 
 - Static HTML/CSS/vanilla ES modules. Zero runtime dependencies or trackers.
