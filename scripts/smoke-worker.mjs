@@ -22,7 +22,7 @@ assert.match(await homepage.text(), /KODYRA/);
 for (const [path,mime] of [['/src/main.js','text/javascript'],['/styles/main.css','text/css'],['/assets/favicon.svg','image/svg+xml']]) {
   const response=await fetchMock(path);
   assert.equal(response.status, 200);
-  assert.match(response.headers.get('content-type'),new RegExp('^'+mime));
+  assert.ok(response.headers.get('content-type').startsWith(mime));
   assert.ok((await response.text()).length>50);
 }
 assert.equal((await fetchMock('/does-not-exist')).status,404);
